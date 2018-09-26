@@ -90,8 +90,6 @@ class Agenda extends React.Component {
       components: { event: Event, date: AgendaDate },
     } = this.props
 
-    console.log(length)
-
     events = events.filter(e =>
       inRange(e, dates.startOf(day, 'day'), dates.endOf(day, 'day'), accessors)
     )
