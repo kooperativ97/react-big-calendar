@@ -53,9 +53,11 @@ class Agenda extends React.Component {
             <table ref="header" className="rbc-agenda-table">
               <thead>
                 <tr>
-                  <th className="rbc-header" ref="dateCol">
-                    {messages.date}
-                  </th>
+                  {length !== 0.5 && (
+                    <th className="rbc-header" ref="dateCol">
+                      {messages.date}
+                    </th>
+                  )}
                   <th className="rbc-header" ref="timeCol">
                     {messages.time}
                   </th>
@@ -80,12 +82,15 @@ class Agenda extends React.Component {
 
   renderDay = (day, events, dayKey) => {
     let {
+      length,
       selected,
       getters,
       accessors,
       localizer,
       components: { event: Event, date: AgendaDate },
     } = this.props
+
+    console.log(length)
 
     events = events.filter(e =>
       inRange(e, dates.startOf(day, 'day'), dates.endOf(day, 'day'), accessors)
@@ -105,7 +110,7 @@ class Agenda extends React.Component {
 
       let dateLabel = idx === 0 && localizer.format(day, 'agendaDateFormat')
       let first =
-        idx === 0 ? (
+        idx === 0 && length !== 0.5 ? (
           <td rowSpan={events.length} className="rbc-agenda-date-cell">
             {AgendaDate ? (
               <AgendaDate day={day} label={dateLabel} />
@@ -187,8 +192,9 @@ class Agenda extends React.Component {
     ]
 
     if (widths[0] !== this._widths[0] || widths[1] !== this._widths[1]) {
-      this.refs.dateCol.style.width = this._widths[0] + 'px'
-      this.refs.timeCol.style.width = this._widths[1] + 'px'
+      if (this.props.length !== 0.5)
+        this.refs.dateCol.style.width = this._widths[0] + 'px'
+      this.refs.timeCol.style.width = this._widths[0] + 'px'
     }
 
     if (isOverflowing) {
@@ -211,7 +217,7 @@ Agenda.navigate = (date, action, { length = Agenda.defaultProps.length }) => {
       return dates.add(date, -length, 'day')
 
     case navigate.NEXT:
-      return dates.add(date, length, 'day')
+      return dates.add(date, length === 0.5 ? 1 : length, 'day')
 
     default:
       return date
